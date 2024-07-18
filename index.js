@@ -28,6 +28,7 @@ function filterData(val, filterType, currentData) {
   if (filterType === 'publicationYear') {
     currentData = currentData.filter((book) => book.publicationYear.toString() === val);
   }
+  console.log("Filtered Examined Books :- ");
   console.log(currentData);
   return currentData;
 }
@@ -38,7 +39,7 @@ function renderSimilarBooks(currentBook) {
     const isInPriceRange = book.price >= (currentBook.price * 0.9) && book.price <= (currentBook.price * 1.1);
     return book.bookId !== currentBook.bookId && (isSameGenre || isInPriceRange);
   });
-  console.log("Similar Books :- ");
+  console.log("All Similar Books :- ");
   console.log(similarBooks);
   const tableBody = document.querySelector('#table-similar-books tbody');
   let temp = 0;
@@ -50,13 +51,10 @@ function renderSimilarBooks(currentBook) {
     <td>${similarBooks[i].price}</td>
     <td>${similarBooks[i].author}</td>
     <td>${similarBooks[i].publicationYear}</td>
-  
     `
     temp++;
     tableBody.appendChild(rowEntry);
-    console.log(rowEntry);
   }
-
 }
 
 function renderSearchedBookDetails(filteredData) {
@@ -88,6 +86,7 @@ async function getBooksData(event) {
     const rawData = await fetch(url);
     const allBookData = await rawData.json();
     data = allBookData;
+    console.log("All Books :- ")
     console.log(allBookData);
     let filteredData = data;
     if (bookIdFilter.value) {
