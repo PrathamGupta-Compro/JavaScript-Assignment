@@ -14,7 +14,7 @@ function filterData(val, filterType, currentData) {
     currentData = currentData.filter((book) => book.bookId === val);
   }
   if (filterType === 'genre') {
-    currentData = currentData.filter((book) => book.genre === val);
+    currentData = currentData.filter((book) => book.genre.toLowerCase() === val.toLowerCase());
   }
   if (filterType === 'priceMin') {
     currentData = currentData.filter((book) => book.price >= val);
@@ -23,13 +23,30 @@ function filterData(val, filterType, currentData) {
     currentData = currentData.filter((book) => book.price <= val);
   }
   if (filterType === 'author') {
-    currentData = currentData.filter((book) => book.author === val);
+    currentData = currentData.filter((book) => book.author.toLowerCase() === val.toLowerCase());
   }
   if (filterType === 'publicationYear') {
-    currentData = currentData.filter((book) => book.publicationYear === val);
+    currentData = currentData.filter((book) => book.publicationYear.toString() === val);
   }
   console.log(currentData);
   return currentData;
+}
+
+function renderSearchedBookDetails(filteredData) {
+  const examinedBookId = document.querySelector('#book-id');
+  const examinedPrice = document.querySelector('#book-price');
+  const examinedGenre = document.querySelector('#book-genre');
+  const examinedAuthor = document.querySelector('#book-author');
+  const examinedPublicationYear = document.querySelector('#book-year');
+
+  if (filteredData.length === 0) {
+    // examinedBookId.innerHTML = '<b>No Record Found</b>';
+    examinedBookId.innerHTML = `<b>No Record Found ${filteredData[0]}</b>`;
+    examinedPrice.innerHTML = '<b>No Record Found</b>';
+    examinedGenre.innerHTML = '<b>No Record Found</b>';
+    examinedAuthor.innerHTML = '<b>No Record Found</b>';
+    examinedPublicationYear.innerHTML = '<b>No Record Found</b>';
+  }
 }
 
 async function getBooksData(event) {
@@ -64,62 +81,4 @@ async function getBooksData(event) {
   }
 }
 
-function renderSearchedBookDetails(filteredData) {
-
-}
 searchBtn.addEventListener('click', getBooksData);
-
-// function filterData(val, filterType, currentData) {
-//   if (filterType === 'bookId') {
-//     return currentData.filter(book => book.bookId === val);
-//   }
-//   if (filterType === 'genre') {
-//     return currentData.filter(book => book.genre.toLowerCase().includes(val.toLowerCase()));
-//   }
-//   if (filterType === 'priceMin') {
-//     return currentData.filter(book => book.price >= parseFloat(val));
-//   }
-//   if (filterType === 'priceMax') {
-//     return currentData.filter(book => book.price <= parseFloat(val));
-//   }
-//   if (filterType === 'author') {
-//     return currentData.filter(book => book.author.toLowerCase().includes(val.toLowerCase()));
-//   }
-//   if (filterType === 'publicationYear') {
-//     return currentData.filter(book => book.publicationYear == val);
-//   }
-//   return currentData;
-// }
-
-// async function getBooksData(event) {
-//   event.preventDefault();
-//   try {
-//     const rawData = await fetch(url);
-//     const allBookData = await rawData.json();
-//     data = allBookData;
-//     console.log(allBookData);
-//     let filteredData = data;
-//     if (bookIdFilter.value) {
-//       filteredData = filterData(bookIdFilter.value, 'bookId', filteredData);
-//     }
-//     if (bookGenreFilter.value) {
-//       filteredData = filterData(bookGenreFilter.value, 'genre', filteredData);
-//     }
-//     if (priceMinFilter.value) {
-//       filteredData = filterData(priceMinFilter.value, 'priceMin', filteredData);
-//     }
-//     if (priceMaxFilter.value) {
-//       filteredData = filterData(priceMaxFilter.value, 'priceMax', filteredData);
-//     }
-//     if (bookAuthorFilter.value) {
-//       filteredData = filterData(bookAuthorFilter.value, 'author', filteredData);
-//     }
-//     if (yearFilter.value) {
-//       filteredData = filterData(yearFilter.value, 'publicationYear', filteredData);
-//     }
-//     console.log('Filtered Data', filteredData);
-//     renderSearchedBookDetails(filteredData); // Call the render function with the filtered data
-//   } catch (err) {
-//     console.error('Error in Fetching Book Data:', err);
-//   }
-// }
