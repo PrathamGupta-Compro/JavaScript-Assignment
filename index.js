@@ -14,7 +14,7 @@ function filterData(val, filterType, currentData) {
     currentData = currentData.filter((book) => book.bookId === val);
   }
   if (filterType === 'genre') {
-    currentData = currentData.filter((book) => book.genre.toLowerCase() === val.toLowerCase());
+    currentData = currentData.filter((book) => book.genre.toLowerCase().includes(val.toLowerCase()));
   }
   if (filterType === 'priceMin') {
     currentData = currentData.filter((book) => book.price >= val);
@@ -23,7 +23,7 @@ function filterData(val, filterType, currentData) {
     currentData = currentData.filter((book) => book.price <= val);
   }
   if (filterType === 'author') {
-    currentData = currentData.filter((book) => book.author.toLowerCase() === val.toLowerCase());
+    currentData = currentData.filter((book) => book.author.toLowerCase().includes(val.toLowerCase()));
   }
   if (filterType === 'publicationYear') {
     currentData = currentData.filter((book) => book.publicationYear.toString() === val);
@@ -40,13 +40,18 @@ function renderSearchedBookDetails(filteredData) {
   const examinedPublicationYear = document.querySelector('#book-year');
 
   if (filteredData.length === 0) {
-    // examinedBookId.innerHTML = '<b>No Record Found</b>';
-    examinedBookId.innerHTML = `<b>No Record Found ${filteredData[0]}</b>`;
+    examinedBookId.innerHTML = '<b>No Record Found</b>';
     examinedPrice.innerHTML = '<b>No Record Found</b>';
     examinedGenre.innerHTML = '<b>No Record Found</b>';
     examinedAuthor.innerHTML = '<b>No Record Found</b>';
     examinedPublicationYear.innerHTML = '<b>No Record Found</b>';
-  }
+  } else {
+    examinedBookId.innerHTML = `<b>${filteredData[0].bookId}</b>`;
+    examinedPrice.innerHTML = `<b>${filteredData[0].price}</b>`;
+    examinedGenre.innerHTML = `<b>${filteredData[0].genre}</b>`;
+    examinedAuthor.innerHTML = `<b>${filteredData[0].author}</b>`;
+    examinedPublicationYear.innerHTML = `<b>${filteredData[0].publicationYear}</b>`;
+  }  
 }
 
 async function getBooksData(event) {
