@@ -5,11 +5,69 @@ const priceMaxFilter = document.querySelector('#input-search-price-max');
 const bookAuthorFilter = document.querySelector('#input-search-author');
 const yearFilter = document.querySelector('#input-search-year');
 const searchBtn = document.querySelector('#btn-search');
-const tableBody = document.querySelector('#table-similar-books tbody');
 
 const url =
   'https://assignment-test-data-101.s3.ap-south-1.amazonaws.com/books.json';
 let data = [];
+
+let currentPage = 1;
+const rowsPerPage = 10;
+
+const paginateData = (data, page, rowsPerPage) =>  {
+  const start = (page-1)*rowsPerPage;
+  const end = start + rowsPerPage;
+  return data.slice(start,end);
+};
+
+const renderPagination = (totalPages) => {
+  const paginationElement = document.querySelector('.pagination');
+  paginationElement.innerHTML = '';
+
+  const createPageItem = (page, text) => {
+    const li = document.createElement('li');
+    li.classList.add('page-item'); // For CSS new class page-itm is added
+    li.innerHTML = `<a class="page-link" href="#">${text}</a>`;
+    if (page === currentPage) {
+      li.classList.add('active');
+    }
+    li.addEventListener('click', (event) => {
+      event.preventDefault();
+      currentPage = page;
+      renderAllBooks();
+    });
+    return li;
+  };
+
+  paginationElement.appendChild(createPageItem(currentPage - 1, 'Previous'));
+
+  for (let i = 1; i <= totalPages; i++) {
+    paginationElement.appendChild(createPageItem(i, i));
+  }
+
+  paginationElement.appendChild(createPageItem(currentPage + 1, 'Next'));
+};
+
+const renderAllBooks = () => {
+  const allBooksTable = document.querySelector('#table-all-books tbody');
+  allBooksTable.innerHTML = '';
+
+  const paginatedData = paginateData(data, currentPage, rowsPerPage);
+  console.log("Pagination Data :- ");
+  console.log(paginatedData);
+  paginatedData.forEach((book) => {
+    const newRow = document.createElement('tr');
+    newRow.innerHTML = `
+      <td>${book.bookId}</td>
+      <td>${book.genre}</td>
+      <td>${book.price}</td>
+      <td>${book.author}</td>
+      <td>${book.publicationYear}</td>`;
+    allBooksTable.appendChild(newRow);
+  });
+
+  const totalPages = Math.ceil(data.length / rowsPerPage);
+  renderPagination(totalPages);
+};
 
 const filterData = (val, filterType, currentData) => {
   if (filterType === 'bookId') {
@@ -41,23 +99,7 @@ const filterData = (val, filterType, currentData) => {
   return currentData;
 };
 
-
-
-
-const renderAllBooks = () => {
-  const allBooksTable = document.querySelector('#table-all-books tbody');
-  allBooksTable.innerHTML = '';
-  for (let i = 0; i < data.length; i++) {
-    const newRow = document.createElement('tr');
-    newRow.innerHTML = `
-    <td>${data[i].bookId}</td>
-    <td>${data[i].genre}</td>
-    <td>${data[i].price}</td>
-    <td>${data[i].author}</td>
-    <td>${data[i].publicationYear}</td>`;
-    allBooksTable.appendChild(newRow);
-  }
-};
+ 
 
 const renderSimilarBooks = (currentBook) => {
   const similarBooks = data.filter((book) => {
@@ -72,7 +114,7 @@ const renderSimilarBooks = (currentBook) => {
   });
   console.log('All Similar Books :- ');
   console.log(similarBooks);
-  tableBody.innerHTML = '';
+  tableBody.innerHTML = ''; //We did this so that, Before adding new row, old row data is cleared out
   let temp = 0;
   for (let i = 0; temp < 5 && i < similarBooks.length; i++) {
     const rowEntry = document.createElement('tr');
