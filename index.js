@@ -100,31 +100,45 @@ const filterData = (val, filterType, currentData) => {
   return currentData;
 };
 
- 
-
+//Here We Want to render Similar Books, firstly on the basis of the same genre and then on the basis of ascending order of price.
 const renderSimilarBooks = (currentBook) => {
-  const similarBooks = data.filter((book) => {
-    const isSameGenre =
+  const similarGenreBooks = data.filter((book) => {
+      return book.bookId !== currentBook.bookId && 
       book.genre.toLowerCase() === currentBook.genre.toLowerCase();
-    const isInPriceRange =
-      book.price >= currentBook.price * 0.9 &&
-      book.price <= currentBook.price * 1.1;
-    return (
-      book.bookId !== currentBook.bookId && (isSameGenre || isInPriceRange)
-    );
+  })
+  const similarPricedBooks = data.filter((book) => {
+      return book.bookId !== currentBook.bookId &&
+      (book.price >= currentBook.price * 0.9 &&
+        book.price <= currentBook.price * 1.1);
   });
+  
+  //Remove Duplicates
+  const similarBooks = new Map();
+
+  similarGenreBooks.forEach(book =>{
+    similarBooks.set(book.bookId, book);
+  });
+
+  similarPricedBooks.forEach(book => {
+    if(!similarBooks.has(book.bookId)){
+      similarBooks.set(book.bookId, book);
+    }
+  });
+
+  const finalBookList = Array.from(similarBooks.values());
+  // similarBooks.sort((a,b) => a.price - b.price);
   console.log('All Similar Books :- ');
-  console.log(similarBooks);
-  tableBody.innerHTML = ''; //We did this so that, Before adding new row, old row data is cleared out
+  console.log(finalBookList);
+  tableBody.innerHTML = ''; //We did this so that, Before adding new row, old row data is cleared out and no duplicate entries are shown.
   let temp = 0;
-  for (let i = 0; temp < 10 && i < similarBooks.length; i++) {
+  for (let i = 0; temp < 10 && i < finalBookList.length; i++) {
     const rowEntry = document.createElement('tr');
     rowEntry.innerHTML = `
-    <td>${similarBooks[i].bookId}</td>
-    <td>${similarBooks[i].genre}</td>
-    <td>${similarBooks[i].price}$</td>
-    <td>${similarBooks[i].author}</td>
-    <td>${similarBooks[i].publicationYear}</td>`;
+    <td>${finalBookList[i].bookId}</td>
+    <td>${finalBookList[i].genre}</td>
+    <td>${finalBookList[i].price}$</td>
+    <td>${finalBookList[i].author}</td>
+    <td>${finalBookList[i].publicationYear}</td>`;
     temp++;
     tableBody.appendChild(rowEntry);
   }
@@ -152,15 +166,15 @@ const renderSearchedBookDetails = (filteredData) => {
         examinedGenre.innerHTML = `<b>${filteredData[len-1].genre}</b>`;
         examinedAuthor.innerHTML = `<b>${filteredData[len-1].author}</b>`;
         examinedPublicationYear.innerHTML = `<b>${filteredData[len-1].publicationYear}</b>`;
-        renderSimilarBooks(filteredData[0]);
+        
       } else {
         examinedBookId.innerHTML = `<b>${filteredData[0].bookId}</b>`;
         examinedPrice.innerHTML = `<b>${filteredData[0].price}$</b>`;
         examinedGenre.innerHTML = `<b>${filteredData[0].genre}</b>`;
         examinedAuthor.innerHTML = `<b>${filteredData[0].author}</b>`;
         examinedPublicationYear.innerHTML = `<b>${filteredData[0].publicationYear}</b>`;
-        renderSimilarBooks(filteredData[0]);
       } 
+      renderSimilarBooks(filteredData[0]);
   }
 };
 
