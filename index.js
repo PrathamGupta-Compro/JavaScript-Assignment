@@ -5,6 +5,7 @@ const priceMaxFilter = document.querySelector('#input-search-price-max');
 const bookAuthorFilter = document.querySelector('#input-search-author');
 const yearFilter = document.querySelector('#input-search-year');
 const searchBtn = document.querySelector('#btn-search');
+const tableBody = document.querySelector('#table-similar-books tbody');
 
 const url =
   'https://assignment-test-data-101.s3.ap-south-1.amazonaws.com/books.json';
@@ -59,7 +60,7 @@ const renderAllBooks = () => {
     newRow.innerHTML = `
       <td>${book.bookId}</td>
       <td>${book.genre}</td>
-      <td>${book.price}</td>
+      <td>${book.price}$</td>
       <td>${book.author}</td>
       <td>${book.publicationYear}</td>`;
     allBooksTable.appendChild(newRow);
@@ -116,12 +117,12 @@ const renderSimilarBooks = (currentBook) => {
   console.log(similarBooks);
   tableBody.innerHTML = ''; //We did this so that, Before adding new row, old row data is cleared out
   let temp = 0;
-  for (let i = 0; temp < 5 && i < similarBooks.length; i++) {
+  for (let i = 0; temp < 10 && i < similarBooks.length; i++) {
     const rowEntry = document.createElement('tr');
     rowEntry.innerHTML = `
     <td>${similarBooks[i].bookId}</td>
     <td>${similarBooks[i].genre}</td>
-    <td>${similarBooks[i].price}</td>
+    <td>${similarBooks[i].price}$</td>
     <td>${similarBooks[i].author}</td>
     <td>${similarBooks[i].publicationYear}</td>`;
     temp++;
@@ -143,14 +144,24 @@ const renderSearchedBookDetails = (filteredData) => {
     examinedGenre.innerHTML = '<b>No Record Found</b>';
     examinedAuthor.innerHTML = '<b>No Record Found</b>';
     examinedPublicationYear.innerHTML = '<b>No Record Found</b>';
-  } else {
-    examinedBookId.innerHTML = `<b>${filteredData[0].bookId}</b>`;
-    examinedPrice.innerHTML = `<b>${filteredData[0].price}</b>`;
-    examinedGenre.innerHTML = `<b>${filteredData[0].genre}</b>`;
-    examinedAuthor.innerHTML = `<b>${filteredData[0].author}</b>`;
-    examinedPublicationYear.innerHTML = `<b>${filteredData[0].publicationYear}</b>`;
+  }  else {
+      if (!priceMinFilter.value && priceMaxFilter.value){
+        const len = filteredData.length;
+        examinedBookId.innerHTML = `<b>${filteredData[len-1].bookId}</b>`;
+        examinedPrice.innerHTML = `<b>${filteredData[len-1].price}$</b>`;
+        examinedGenre.innerHTML = `<b>${filteredData[len-1].genre}</b>`;
+        examinedAuthor.innerHTML = `<b>${filteredData[len-1].author}</b>`;
+        examinedPublicationYear.innerHTML = `<b>${filteredData[len-1].publicationYear}</b>`;
+        renderSimilarBooks(filteredData[0]);
+      } else {
+        examinedBookId.innerHTML = `<b>${filteredData[0].bookId}</b>`;
+        examinedPrice.innerHTML = `<b>${filteredData[0].price}$</b>`;
+        examinedGenre.innerHTML = `<b>${filteredData[0].genre}</b>`;
+        examinedAuthor.innerHTML = `<b>${filteredData[0].author}</b>`;
+        examinedPublicationYear.innerHTML = `<b>${filteredData[0].publicationYear}</b>`;
+        renderSimilarBooks(filteredData[0]);
+      } 
   }
-  renderSimilarBooks(filteredData[0]);
 };
 
 async function getBooksData(event) {
@@ -179,13 +190,12 @@ async function getBooksData(event) {
       filteredData = filterData(bookAuthorFilter.value, 'author', filteredData);
     }
     if (yearFilter.value) {
-      filteredData = filterData(
-        yearFilter.value,
-        'publicationYear',
-        filteredData
-      );
+      filteredData = filterData(yearFilter.value, 'publicationYear',filteredData);
     }
-    renderSearchedBookDetails(filteredData);
+    if(bookIdFilter.value || bookGenreFilter.value || priceMinFilter.value || priceMaxFilter.value || bookAuthorFilter.value  || yearFilter.value){
+      filteredData.sort((a, b) => a.price - b.price);
+      renderSearchedBookDetails(filteredData);
+    }
   } catch (err) {
     console.error('Error in Fetching Book Data');
   }
