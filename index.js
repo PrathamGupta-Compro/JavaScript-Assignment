@@ -1,4 +1,4 @@
-const bookIdFilter = document.querySelector('#input-search-id');
+const bookNameFilter = document.querySelector('#input-search-name');
 const bookGenreFilter = document.querySelector('#input-search-genre');
 const priceMinFilter = document.querySelector('#input-search-price-min');
 const priceMaxFilter = document.querySelector('#input-search-price-max');
@@ -7,7 +7,8 @@ const yearFilter = document.querySelector('#input-search-year');
 const searchBtn = document.querySelector('#btn-search');
 const tableBody = document.querySelector('#table-similar-books tbody');
 const tableth = document.querySelector('table th');
-const similarBookContainer = document.querySelector('.similar-book-container')
+const similarBookContainer = document.querySelector('.similar-book-container');
+const defaultImage = './product-not-found.png';
 
 const url =
   'https://assignment-test-data-101.s3.ap-south-1.amazonaws.com/books-v2.json';
@@ -105,11 +106,13 @@ const renderAllBooks = () => {
   console.log('Pagination Data :- ');
   console.log(paginatedData);
   paginatedData.forEach((book) => {
+    const coverImage = book.coverImage ? book.coverImage : defaultImage;
     const newRow = document.createElement('tr');
     newRow.innerHTML = `
-      <td>${book.bookId}</td>
+      <td><img src="${coverImage}" alt="${book.bookName}" style="width:50px;height:50px; object-fit:"contain""></td>
+      <td>${book.bookName}</td>
       <td>${book.genre}</td>
-      <td>${book.price}$</td>
+      <td>$ ${book.price}</td>
       <td>${book.author}</td>
       <td>${book.publicationYear}</td>`;
     allBooksTable.appendChild(newRow);
@@ -120,8 +123,9 @@ const renderAllBooks = () => {
 };
 
 const filterData = (val, filterType, currentData) => {
-  if (filterType === 'bookId') {
-    currentData = currentData.filter((book) => book.bookId === val);
+  if (filterType === 'bookName') {
+    currentData = currentData.filter((book) => 
+      book.bookName.toLowerCase().includes(val.toLowerCase()));
   }
   if (filterType === 'genre') {
     currentData = currentData.filter((book) =>
@@ -186,11 +190,13 @@ const renderSimilarBooks = (currentBook) => {
   tableBody.innerHTML = ''; //We did this so that, Before adding new row, old row data is cleared out and no duplicate entries are shown.
   let temp = 0;
   for (let i = 0; temp < 10 && i < finalBookList.length; i++) {
+    const coverImage = finalBookList[i].coverImage ? finalBookList[i].coverImage : defaultImage;
     const rowEntry = document.createElement('tr');
     rowEntry.innerHTML = `
-    <td>${finalBookList[i].bookId}</td>
+    <td><img src="${coverImage}" alt="${finalBookList[i].bookName}" style="width:50px;height:50px; object-fit:"contain"></td>
+    <td>${finalBookList[i].bookName}</td>
     <td>${finalBookList[i].genre}</td>
-    <td>${finalBookList[i].price}$</td>
+    <td>$ ${finalBookList[i].price}</td>
     <td>${finalBookList[i].author}</td>
     <td>${finalBookList[i].publicationYear}</td>`;
     temp++;
@@ -201,37 +207,46 @@ const renderSimilarBooks = (currentBook) => {
 
 const renderSearchedBookDetails = (filteredData) => {
   const examinedBookName = document.querySelector('#book-name');
-  const examinedBookId = document.querySelector('#book-id');
+  // const examinedBookId = document.querySelector('#book-id');
   const examinedPrice = document.querySelector('#book-price');
   const examinedGenre = document.querySelector('#book-genre');
   const examinedAuthor = document.querySelector('#book-author');
+  const examinedImage = document.querySelector('#book-image');
   const examinedPublicationYear = document.querySelector('#book-year');
-
   if (filteredData.length === 0) {
     examinedBookName.innerHTML = '<b>No Record Found</b>'
-    examinedBookId.innerHTML = '<b>No Record Found</b>';
     examinedPrice.innerHTML = '<b>No Record Found</b>';
     examinedGenre.innerHTML = '<b>No Record Found</b>';
     examinedAuthor.innerHTML = '<b>No Record Found</b>';
     examinedPublicationYear.innerHTML = '<b>No Record Found</b>';
+    examinedImage.style.display = 'none';
   } else {
     if (!priceMinFilter.value && priceMaxFilter.value) {
       const len = filteredData.length;
+      const coverImage = filteredData[len-1].coverImage ? filteredData[len-1].coverImage : defaultImage;
       examinedBookName.innerHTML = `<b>${filteredData[len-1].bookName}</b>`;
-      examinedBookId.innerHTML = `<b>${filteredData[len - 1].bookId}</b>`;
-      examinedPrice.innerHTML = `<b>${filteredData[len - 1].price}$</b>`;
+      examinedPrice.innerHTML = `<b>$ ${filteredData[len - 1].price}</b>`;
       examinedGenre.innerHTML = `<b>${filteredData[len - 1].genre}</b>`;
       examinedAuthor.innerHTML = `<b>${filteredData[len - 1].author}</b>`;
       examinedPublicationYear.innerHTML = `<b>${
         filteredData[len - 1].publicationYear
       }</b>`;
+      examinedImage.src = coverImage;  // Set image source
+      console.log(examinedImage.src);
+      examinedImage.style.display = 'block';
     } else {
+      const coverImage = filteredData[0].coverImage ? filteredData[0].coverImage : defaultImage;
       examinedBookName.innerHTML = `<b>${filteredData[0].bookName}</b>`;
-      examinedBookId.innerHTML = `<b>${filteredData[0].bookId}</b>`;
-      examinedPrice.innerHTML = `<b>${filteredData[0].price}$</b>`;
+      // examinedBookId.innerHTML = `<b>${filteredData[0].bookId}</b>`;
+      examinedPrice.innerHTML = `<b>$ ${filteredData[0].price}</b>`;
       examinedGenre.innerHTML = `<b>${filteredData[0].genre}</b>`;
       examinedAuthor.innerHTML = `<b>${filteredData[0].author}</b>`;
       examinedPublicationYear.innerHTML = `<b>${filteredData[0].publicationYear}</b>`;
+      examinedImage.src = coverImage;  // Set image source
+      examinedImage.style.display = 'block';
+      console.log(coverImage);
+      console.log(examinedImage);
+      console.log(examinedImage.src);
     }
     renderSimilarBooks(filteredData[0]);
   }
@@ -247,8 +262,8 @@ async function getBooksData(event) {
     console.log('All Books :- ');
     console.log(allBookData);
     let filteredData = data;
-    if (bookIdFilter.value) {
-      filteredData = filterData(bookIdFilter.value, 'bookId', filteredData);
+    if (bookNameFilter.value) {
+      filteredData = filterData(bookNameFilter.value, 'bookName', filteredData);
     }
     if (bookGenreFilter.value) {
       filteredData = filterData(bookGenreFilter.value, 'genre', filteredData);
@@ -270,7 +285,7 @@ async function getBooksData(event) {
       );
     }
     if (
-      bookIdFilter.value ||
+      bookNameFilter.value ||
       bookGenreFilter.value ||
       priceMinFilter.value ||
       priceMaxFilter.value ||
@@ -303,7 +318,7 @@ document.querySelectorAll('.table-sortable th').forEach((headerCell) => {
     );
     const currentIsAsc = headerCell.classList.contains('th-sort-asc');
     // Only sort if the column is Price (index 2) or Publication Year (index 4)
-    if (headerIndex == 2 || headerIndex == 4) {
+    if (headerIndex == 3 || headerIndex == 5) {
       sortTableCol(tableElement, headerIndex, !currentIsAsc);
     }
   });
