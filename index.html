@@ -13,7 +13,7 @@
         <div id="div-search" class="container" style="margin-bottom:20px; padding-top:20px;">
             <h3>Search Books</h3>
             <form action="#">
-                <input type="text" id="input-search-id" class="form-control" style="width:25%;display:inline;" placeholder="Book Id">
+                <input type="text" id="input-search-name" class="form-control" style="width:25%;display:inline;" placeholder="Book Name">
                 <input type="text" id="input-search-genre" class="form-control" style="width:25%;display:inline;" placeholder="Genre">
                 <input type="text" id="input-search-price-min" class="form-control" style="width:12%;display:inline;" placeholder="Price Min">
                 <input type="text" id="input-search-price-max" class="form-control" style="width:12%;display:inline;" placeholder="Price Max">
@@ -23,28 +23,34 @@
             </form>
         </div>
 
-        <div id="div-examined-book"  class="container" style="margin-bottom:20px">
-            <h3>Examined Book</h3>
-            <ul id="list-examined-book" class="list-group">
-                <li class="list-group-item">Book Name: <span id="book-name"></span></li>
-                <li class="list-group-item">Book Id: <span id="book-id"></span></li>
-                <li class="list-group-item">Price: <span id="book-price"></span></li>
-                <li class="list-group-item">Genre: <span id="book-genre"></span></li>
-                <li class="list-group-item">Author: <span id="book-author"></span></li>
-                <li class="list-group-item">Publication Year: <span id="book-year"></span></li>
-            </ul>
+        <div id="div-examined-book"  class="container" style="margin-bottom:20px; display: flex; flex-direction: column; align-items: center; justify-content: center; width: full; object-fit: contain;">
+            <h3 style="align-self: baseline;">Examined Book</h3>
+            <div class="examined-book-details">
+                <img id="book-image" src="./product-not-found.png" alt="" class="img-fluid img-thumbnail">
+                <ul id="list-examined-book" class="list-group">
+                    <li class="list-group-item">Book Name: <span id="book-name"></span></li>
+                    <!-- <li class="list-group-item">Book Id: <span id="book-id"></span></li> -->
+                    <li class="list-group-item">Price: <span id="book-price"></span></li>
+                    <li class="list-group-item">Genre: <span id="book-genre"></span></li>
+                    <li class="list-group-item">Author: <span id="book-author"></span></li>
+                    <li class="list-group-item">Publication Year: <span id="book-year"></span></li>
+                </ul>
+            </div>
         </div>
 
         <div  class="container similar-book-container" style="margin-bottom:20px">
-            <h3>List of Similar Books</h3>
-            <table id="table-similar-books" class="table table-sortable">
-                <thead>
-                    <th>BookId</th>
+            <div class="similar-book-header" style="display: flex; justify-content: space-between;">
+                <h3>List of Similar Books </h3> 
+                <span id="similar-book-count" style="align-content: end;"></span>
+            </div>
+            <table id="table-similar-books" class="table table-striped table-sortable ">
+                <thead class="table-dark">
+                    <th>Thumbnail </th>
+                    <th>Book Name</th>
                     <th>Genre</th>
-                    <th>Price</th>
+                    <th>Price <span></span></th>
                     <th>Author</th>
                     <th>Publication Year</th>
-                    <!-- <th>Examine</th> -->
                 </thead>
                 <tbody></tbody>
             </table>
@@ -52,14 +58,14 @@
 
         <div  class="container" style="margin-bottom:20px">
             <h3>List of All Books</h3>
-            <table id="table-all-books" class="table table-sortable">
-                <thead>
-                    <th>BookId</th>
+            <table id="table-all-books" class="table table-striped table-sortable ">
+                <thead class="table-dark">
+                    <th>Thumbnail </th>
+                    <th>Book Name</th>
                     <th>Genre</th>
                     <th>Price</th>
                     <th>Author</th>
                     <th>Publication Year</th>
-                    <!-- <th>Examine</th> -->
                 </thead>
                 <tbody></tbody>
             </table>
