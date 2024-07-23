@@ -14,7 +14,7 @@ function filterData(val, filterType, currentData) {
     currentData = currentData.filter((book) => book.bookId === val);
   }
   if (filterType === 'genre') {
-    currentData = currentData.filter((book) => book.genre.toLowerCase() === val.toLowerCase());
+    currentData = currentData.filter((book) => book.genre.toLowerCase().includes(val.toLowerCase()));
   }
   if (filterType === 'priceMin') {
     currentData = currentData.filter((book) => book.price >= val);
@@ -23,13 +23,38 @@ function filterData(val, filterType, currentData) {
     currentData = currentData.filter((book) => book.price <= val);
   }
   if (filterType === 'author') {
-    currentData = currentData.filter((book) => book.author.toLowerCase() === val.toLowerCase());
+    currentData = currentData.filter((book) => book.author.toLowerCase().includes(val.toLowerCase()));
   }
   if (filterType === 'publicationYear') {
     currentData = currentData.filter((book) => book.publicationYear.toString() === val);
   }
+  console.log("Filtered Examined Books :- ");
   console.log(currentData);
   return currentData;
+}
+
+function renderSimilarBooks(currentBook) {
+  const similarBooks = data.filter((book) => {
+    const isSameGenre = book.genre.toLowerCase() === currentBook.genre.toLowerCase();
+    const isInPriceRange = book.price >= (currentBook.price * 0.9) && book.price <= (currentBook.price * 1.1);
+    return book.bookId !== currentBook.bookId && (isSameGenre || isInPriceRange);
+  });
+  console.log("All Similar Books :- ");
+  console.log(similarBooks);
+  const tableBody = document.querySelector('#table-similar-books tbody');
+  let temp = 0;
+  for(let i = 0; temp < 10 && i < similarBooks.length; i++){
+    const rowEntry = document.createElement('tr');
+    rowEntry.innerHTML = `
+    <td>${similarBooks[i].bookId}</td>
+    <td>${similarBooks[i].genre}</td>
+    <td>${similarBooks[i].price}</td>
+    <td>${similarBooks[i].author}</td>
+    <td>${similarBooks[i].publicationYear}</td>
+    `
+    temp++;
+    tableBody.appendChild(rowEntry);
+  }
 }
 
 function renderSearchedBookDetails(filteredData) {
@@ -40,13 +65,19 @@ function renderSearchedBookDetails(filteredData) {
   const examinedPublicationYear = document.querySelector('#book-year');
 
   if (filteredData.length === 0) {
-    // examinedBookId.innerHTML = '<b>No Record Found</b>';
-    examinedBookId.innerHTML = `<b>No Record Found ${filteredData[0]}</b>`;
+    examinedBookId.innerHTML = '<b>No Record Found</b>';
     examinedPrice.innerHTML = '<b>No Record Found</b>';
     examinedGenre.innerHTML = '<b>No Record Found</b>';
     examinedAuthor.innerHTML = '<b>No Record Found</b>';
     examinedPublicationYear.innerHTML = '<b>No Record Found</b>';
-  }
+  } else {
+    examinedBookId.innerHTML = `<b>${filteredData[0].bookId}</b>`;
+    examinedPrice.innerHTML = `<b>${filteredData[0].price}</b>`;
+    examinedGenre.innerHTML = `<b>${filteredData[0].genre}</b>`;
+    examinedAuthor.innerHTML = `<b>${filteredData[0].author}</b>`;
+    examinedPublicationYear.innerHTML = `<b>${filteredData[0].publicationYear}</b>`;
+  }  
+  renderSimilarBooks(filteredData[0]);
 }
 
 async function getBooksData(event) {
@@ -55,6 +86,7 @@ async function getBooksData(event) {
     const rawData = await fetch(url);
     const allBookData = await rawData.json();
     data = allBookData;
+    console.log("All Books :- ")
     console.log(allBookData);
     let filteredData = data;
     if (bookIdFilter.value) {
