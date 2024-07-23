@@ -253,14 +253,25 @@ const renderSearchedBookDetails = (filteredData) => {
 };
 
 async function getBooksData(event) {
-  event.preventDefault();
+  if(event){
+    event.preventDefault();
+  }
   // tableBody.innerHTML = '<b>No Similar Books</b>';
-  try {
-    const rawData = await fetch(url);
-    const allBookData = await rawData.json();
-    data = allBookData;
-    console.log('All Books :- ');
-    console.log(allBookData);
+  const localData = localStorage.getItem('bookData');
+  if(localData){
+    console.log('Data fetched from local storage:');
+    data = JSON.parse(localData);
+  } else{
+      try {
+        const rawData = await fetch(url);
+        const allBookData = await rawData.json();
+        data = allBookData;
+        localStorage.setItem('booksData', JSON.stringify(allBookData));
+        console.log('Data fetched and stored in local storage:');
+        console.log(allBookData);
+      } catch (err) {
+        console.error('Error in Fetching Book Data');
+      }
     let filteredData = data;
     if (bookNameFilter.value) {
       filteredData = filterData(bookNameFilter.value, 'bookName', filteredData);
@@ -298,10 +309,43 @@ async function getBooksData(event) {
     if(filteredData.length === 0){
       similarBookContainer.style.display = "none";
     }
-  } catch (err) {
-    console.error('Error in Fetching Book Data');
+    savePageState();
+  } 
+}
+
+//THIS Fn saves the state of filter values and saves it in  local storage
+function savePageState() {
+  const filterState = {
+    bookName: bookNameFilter.value,
+    bookGenre: bookGenreFilter.value,
+    priceMin: priceMinFilter.value,
+    priceMax: priceMaxFilter.value,
+    bookAuthor: bookAuthorFilter.value,
+    year: yearFilter.value,
+    currentPage: currentPage,
+  };
+  localStorage.setItem(
+    'filterState',
+    JSON.stringify(filterState)
+  );
+}
+
+function loadPageState() {
+  const filterState = JSON.parse(localStorage.getItem('filterState'));
+  if (filterState) {
+    bookNameFilter.value = filterState.bookName;
+    bookGenreFilter.value = filterState.bookGenre;
+    priceMinFilter.value = filterState.priceMin;
+    priceMaxFilter.value = filterState.priceMax;
+    bookAuthorFilter.value = filterState.bookAuthor;
+    yearFilter.value = filterState.year;
   }
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadPageState(); //Calls the loadPageState function when the page loads fully to checks if there is any saved state
+  getBooksData();
+});
 
 searchBtn.addEventListener('click', getBooksData);
 
