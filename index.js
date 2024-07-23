@@ -9,6 +9,7 @@ const tableBody = document.querySelector('#table-similar-books tbody');
 const tableth = document.querySelector('table th');
 const similarBookContainer = document.querySelector('.similar-book-container');
 const defaultImage = './product-not-found.png';
+const similarBookCount = document.querySelector('#similar-book-count');
 
 const url =
   'https://assignment-test-data-101.s3.ap-south-1.amazonaws.com/books-v2.json';
@@ -84,6 +85,7 @@ const renderPagination = (totalPages) => {
       event.preventDefault();
       currentPage = page;
       renderAllBooks();
+      savePageState(); // Calling the Fn to save the current page state.
     });
     return li;
   };
@@ -202,6 +204,7 @@ const renderSimilarBooks = (currentBook) => {
     temp++;
     tableBody.appendChild(rowEntry);
   }
+  similarBookCount.innerHTML = `Showing <b>${temp}</b> of <b>${finalBookList.length}</b> Similar Book(s)`;
   renderAllBooks();
 };
 
@@ -251,6 +254,69 @@ const renderSearchedBookDetails = (filteredData) => {
     renderSimilarBooks(filteredData[0]);
   }
 };
+
+function getBooksDataPromises(event) {
+  if (event) {
+    event.preventDefault();
+  }
+
+  const localData = localStorage.getItem('bookData');
+  let fetchedDataPromise;
+
+  if (localData) {
+    fetchedDataPromise = Promise.resolve(JSON.parse(localData));
+  } else {
+    fetchedDataPromise = fetch(url)
+      .then((res) => res.json())
+      .then((allBookData) => {
+        localStorage.setItem('bookData', JSON.stringify(allBookData));
+        return allBookData;
+      })
+      .catch((err) => {
+        console.error('Error in Fetching Book Data', err);
+        return [];
+      });
+  }
+
+  fetchedDataPromise.then((allBookData) => {
+    data = allBookData;
+
+    let filteredData = data;
+    if (bookNameFilter.value) {
+      filteredData = filterData(bookNameFilter.value, 'bookName', filteredData);
+    }
+    if (bookGenreFilter.value) {
+      filteredData = filterData(bookGenreFilter.value, 'genre', filteredData);
+    }
+    if (priceMinFilter.value) {
+      filteredData = filterData(priceMinFilter.value, 'priceMin', filteredData);
+    }
+    if (priceMaxFilter.value) {
+      filteredData = filterData(priceMaxFilter.value, 'priceMax', filteredData);
+    }
+    if (bookAuthorFilter.value) {
+      filteredData = filterData(bookAuthorFilter.value, 'author', filteredData);
+    }
+    if (yearFilter.value) {
+      filteredData = filterData(yearFilter.value, 'publicationYear', filteredData);
+    }
+    if (
+      bookNameFilter.value ||
+      bookGenreFilter.value ||
+      priceMinFilter.value ||
+      priceMaxFilter.value ||
+      bookAuthorFilter.value ||
+      yearFilter.value
+    ) {
+      filteredData.sort((a, b) => a.price - b.price);
+      renderSearchedBookDetails(filteredData);
+    }
+    if (filteredData.length === 0) {
+      similarBookContainer.style.display = 'none';
+    }
+    savePageState();
+  });
+}
 
 async function getBooksData(event) {
   if(event){
@@ -322,7 +388,7 @@ function savePageState() {
     priceMax: priceMaxFilter.value,
     bookAuthor: bookAuthorFilter.value,
     year: yearFilter.value,
-    currentPage: currentPage,
+    currentPage: currentPage
   };
   localStorage.setItem(
     'filterState',
@@ -339,15 +405,18 @@ function loadPageState() {
     priceMaxFilter.value = filterState.priceMax;
     bookAuthorFilter.value = filterState.bookAuthor;
     yearFilter.value = filterState.year;
+    currentPage = filterState.currentPage;
   }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
   loadPageState(); //Calls the loadPageState function when the page loads fully to checks if there is any saved state
-  getBooksData();
+  // getBooksData();
+  getBooksDataPromises();
 });
 
-searchBtn.addEventListener('click', getBooksData);
+// searchBtn.addEventListener('click', getBooksData);
+searchBtn.addEventListener('click', getBooksDataPromises);
 
 document.querySelectorAll('.table-sortable th').forEach((headerCell) => {
   headerCell.addEventListener('click', () => {
