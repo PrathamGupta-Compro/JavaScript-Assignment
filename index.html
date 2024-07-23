@@ -4,6 +4,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+        <link rel="stylesheet" href="./style.css">
         
         <title>Book Catalog</title>
     </head>
@@ -25,6 +26,7 @@
         <div id="div-examined-book"  class="container" style="margin-bottom:20px">
             <h3>Examined Book</h3>
             <ul id="list-examined-book" class="list-group">
+                <li class="list-group-item">Book Name: <span id="book-name"></span></li>
                 <li class="list-group-item">Book Id: <span id="book-id"></span></li>
                 <li class="list-group-item">Price: <span id="book-price"></span></li>
                 <li class="list-group-item">Genre: <span id="book-genre"></span></li>
@@ -33,13 +35,13 @@
             </ul>
         </div>
 
-        <div  class="container" style="margin-bottom:20px">
+        <div  class="container similar-book-container" style="margin-bottom:20px">
             <h3>List of Similar Books</h3>
             <table id="table-similar-books" class="table table-sortable">
                 <thead>
                     <th>BookId</th>
                     <th>Genre</th>
-                    <th >Price</th>
+                    <th>Price</th>
                     <th>Author</th>
                     <th>Publication Year</th>
                     <!-- <th>Examine</th> -->

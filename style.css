@@ -1,0 +1,11 @@
+.table-sortable thead th{
+    cursor: pointer;
+}
+.table-sortable .th-sort-asc::after{
+    content:'\25b4';
+}
+.table-sortable .th-sort-desc::after{
+    content:'\25be';
+    color: black;
+}
+
