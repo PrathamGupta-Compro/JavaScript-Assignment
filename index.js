@@ -4,32 +4,27 @@ const priceMinFilter = document.querySelector('#input-search-price-min');
 const priceMaxFilter = document.querySelector('#input-search-price-max');
 const bookAuthorFilter = document.querySelector('#input-search-author');
 const yearFilter = document.querySelector('#input-search-year');
-const searchBtn = document.querySelector('#btn-search');
 const similarTableBody = document.querySelector('#table-similar-books tbody');
 const allBooksTableBody = document.querySelector('#table-all-books tbody');
-const tableth = document.querySelector('table th');
 const similarBookContainer = document.querySelector('.similar-book-container');
 const defaultImage = './product-not-found.png';
 const similarBookCount = document.querySelector('#similar-book-count');
-const upArrowSort = document.querySelector('.fa-arrow-up-short-wide');
-const downArrowSort = document.querySelector('.fa-arrow-down-short-wide');
+// const upArrowSort = document.querySelector('.fa-arrow-up-short-wide');
+// const downArrowSort = document.querySelector('.fa-arrow-down-short-wide');
 
 const url = 'https://assignment-test-data-101.s3.ap-south-1.amazonaws.com/books-v2.json';
 let data = [];
 let finalSimilarBookList = [];
 
-let isAsc = true
+let isAsc = true;
 let currentPage = 1;
 const rowsPerPage = 10;
-
-
 
 const paginateData = (data, page, rowsPerPage) => {
   const start = (page - 1) * rowsPerPage;
   const end = start + rowsPerPage;
   return data.slice(start, end);
 };
-
 
 const renderPagination = (totalPages) => {
   const paginationElement = document.querySelector('.pagination');
@@ -44,7 +39,7 @@ const renderPagination = (totalPages) => {
     }
     li.addEventListener('click', (event) => {
       event.preventDefault();
-      if(page >=1 && page <= totalPages) {
+      if (page >= 1 && page <= totalPages) {
         currentPage = page;
         renderAllBooks();
       }
@@ -54,7 +49,7 @@ const renderPagination = (totalPages) => {
 
   paginationElement.appendChild(createPageItem(currentPage - 1, 'Previous'));
 
-  for (let i = 1; i <= totalPages; i++) {
+  for (let i = 1; i <= totalPages; i += 1) {
     paginationElement.appendChild(createPageItem(i, i));
   }
 
@@ -115,9 +110,8 @@ const filterData = (val, filterType, currentData) => {
 // Here We Want to render Similar Books, firstly on the basis of the same genre and then on the basis of ascending order of price.
 // RULE: We want to display similar books with same genre and similarPrice Range in sorted Order, then the rest.
 const renderSimilarBooks = (currentBook) => {
-  
   const similarGenreAndPriceBooks = data.filter((book) => (
-    book.bookId !== currentBook.bookId 
+    book.bookId !== currentBook.bookId
       && book.price >= currentBook.price * 0.9
       && book.price <= currentBook.price * 1.1
       && book.genre.toLowerCase() === currentBook.genre.toLowerCase()
@@ -141,7 +135,7 @@ const renderSimilarBooks = (currentBook) => {
   });
 
   similarGenreBooks.forEach((book) => {
-    if(!similarBooks.has(book.bookId)) {
+    if (!similarBooks.has(book.bookId)) {
       similarBooks.set(book.bookId, book);
     }
   });
@@ -158,7 +152,7 @@ const renderSimilarBooks = (currentBook) => {
   console.log(finalSimilarBookList);
   similarTableBody.innerHTML = ''; // We did this so that, Before adding new row, old row data is cleared out and no duplicate entries are shown.
   let temp = 0;
-  for (let i = 0; temp < 10 && i < finalSimilarBookList.length; i++) {
+  for (let i = 0; temp < 10 && i < finalSimilarBookList.length; i += 1) {
     const coverImage = finalSimilarBookList[i].coverImage
       ? finalSimilarBookList[i].coverImage
       : defaultImage;
@@ -170,7 +164,7 @@ const renderSimilarBooks = (currentBook) => {
     <td>$ ${finalSimilarBookList[i].price}</td>
     <td>${finalSimilarBookList[i].author}</td>
     <td>${finalSimilarBookList[i].publicationYear}</td>`;
-    temp++;
+    temp += 1;
     similarTableBody.appendChild(rowEntry);
   }
   similarBookCount.innerHTML = `Showing <b>${temp}</b> of <b>${finalSimilarBookList.length}</b> Similar Book(s)`;
@@ -217,8 +211,7 @@ const renderSearchedBookDetails = (filteredData) => {
   }
 };
 
-
-//API CALL THROUGH PROMISES
+// API CALL THROUGH PROMISES
 // function getBooksDataPromises(event) {
 //   if (event) {
 //     event.preventDefault();
@@ -316,7 +309,7 @@ const savePageState = () => {
     year: yearFilter.value,
   };
   localStorage.setItem('filterState', JSON.stringify(filterState));
-}
+};
 
 const loadPageState = () => {
   console.log('In loadPageState');
@@ -329,22 +322,24 @@ const loadPageState = () => {
     bookAuthorFilter.value = filterState.bookAuthor;
     yearFilter.value = filterState.year;
   }
-}
+};
 
-const handleSort = (valType,tableType) => {
+const handleSort = (valType, tableType) => {
   console.log(valType);
   console.log(tableType);
-  if(tableType === 'similar-books-table'){
-    console.log('In If of Similar  Books');;
+  if (tableType === 'similar-books-table') {
+    console.log('In If of Similar  Books');
     console.log(finalSimilarBookList);
     similarTableBody.innerHTML = '';
     if (valType === 'price') {
-      finalSimilarBookList.sort((a, b) => isAsc ? a.price - b.price : b.price - a.price);
+      finalSimilarBookList.sort((a, b) => (isAsc ? a.price - b.price : b.price - a.price));
     } else if (valType === 'year') {
-      finalSimilarBookList.sort((a, b) => isAsc ? a.publicationYear - b.publicationYear : b.publicationYear - a.publicationYear);
+      finalSimilarBookList.sort((a, b) => (
+        isAsc ? a.publicationYear - b.publicationYear : b.publicationYear - a.publicationYear
+      ));
     }
     isAsc = !isAsc;
-    for (let i = 0; i < finalSimilarBookList.length; i++) {
+    for (let i = 0; i < finalSimilarBookList.length; i += 1) {
       const coverImage = finalSimilarBookList[i].coverImage || defaultImage;
       const rowEntry = document.createElement('tr');
       rowEntry.innerHTML = `
@@ -356,18 +351,17 @@ const handleSort = (valType,tableType) => {
         <td>${finalSimilarBookList[i].publicationYear}</td>`;
       similarTableBody.appendChild(rowEntry);
     }
-  }else if (tableType === 'all-books-table'){
+  } else if (tableType === 'all-books-table') {
     allBooksTableBody.innerHTML = '';
-    if(valType === 'price'){
-      data.sort((a, b) => isAsc ? a.price - b.price : b.price - a.price);
-    }else if(valType === 'year'){
-      data.sort((a, b) => isAsc ? a.publicationYear - b.publicationYear : b.publicationYear - a.publicationYear);
+    if (valType === 'price') {
+      data.sort((a, b) => (isAsc ? a.price - b.price : b.price - a.price));
+    } else if (valType === 'year') {
+      data.sort((a, b) => (isAsc ? a.publicationYear - b.publicationYear : b.publicationYear - a.publicationYear));
     }
     isAsc = !isAsc;
     renderAllBooks();
   }
-
-}
+};
 
 const handleSearch = () => {
   let filteredData = data;
@@ -420,7 +414,3 @@ const initialize = async () => {
   renderAllBooks();
 };
 initialize();
-
-
-
-// aJ24-8Ufb
