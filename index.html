@@ -4,6 +4,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
         <link rel="stylesheet" href="./style.css">
         
         <title>Book Catalog</title>
@@ -19,7 +20,7 @@
                 <input type="text" id="input-search-price-max" class="form-control" style="width:12%;display:inline;" placeholder="Price Max">
                 <input type="text" id="input-search-author" class="form-control" style="width:25%;display:inline;" placeholder="Author">
                 <input type="text" id="input-search-year" class="form-control" style="width:25%;display:inline;" placeholder="Publication Year">
-                <button id="btn-search" class="btn" type="submit">Search</button>
+                <button id="btn-search" class="btn" type="submit" onclick="handleSearch()">Search</button>
             </form>
         </div>
 
@@ -48,9 +49,9 @@
                     <th>Thumbnail </th>
                     <th>Book Name</th>
                     <th>Genre</th>
-                    <th>Price <span></span></th>
+                    <th onclick="handleSort('price','similar-books-table')">Price <span><i class="fa-solid fa-arrow-up-short-wide" style="color: #ffffff;"></i></span><span><i class="fa-solid fa-arrow-down-short-wide" style="color: #ffffff;"></i></span></th>
                     <th>Author</th>
-                    <th>Publication Year</th>
+                    <th onclick="handleSort('year','similar-books-table')">Publication Year <span><i class="fa-solid fa-arrow-up-short-wide" style="color: #ffffff;"></i></span><span><i class="fa-solid fa-arrow-down-short-wide" style="color: #ffffff;"></i></span></th>
                 </thead>
                 <tbody></tbody>
             </table>
@@ -63,9 +64,9 @@
                     <th>Thumbnail </th>
                     <th>Book Name</th>
                     <th>Genre</th>
-                    <th>Price</th>
+                    <th onclick="handleSort('price','all-books-table')">Price <span><i class="fa-solid fa-arrow-up-short-wide" style="color: #ffffff;"></i></span><span><i class="fa-solid fa-arrow-down-short-wide" style="color: #ffffff;"></i></span></th>
                     <th>Author</th>
-                    <th>Publication Year</th>
+                    <th onclick="handleSort('year','all-books-table')">Publication Year <span><i class="fa-solid fa-arrow-up-short-wide" style="color: #ffffff;"></i></span><span><i class="fa-solid fa-arrow-down-short-wide" style="color: #ffffff;"></i></span></th>
                 </thead>
                 <tbody></tbody>
             </table>

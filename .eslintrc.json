@@ -1,4 +1,10 @@
 {
     "extends": "airbnb-base",
-    "eslint linebreak-style" : ["error", "windows"]
-}
+    "rules": {
+    "linebreak-style": ["off"]
+  },
+    "globals": {
+      "document": "readonly"
+    }
+  }
+  
