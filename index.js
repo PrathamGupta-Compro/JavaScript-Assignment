@@ -126,16 +126,63 @@ const renderAllBooks = () => {
 * @returns {Array<Object>} - A new array of book objects that match the filter criteria. */
 const filterData = (val, filterType, currentData) => {
   switch (filterType) {
-    case 'bookName':
-      return currentData.filter((book) => book.bookName.toLowerCase().includes(val.toLowerCase()));
-    case 'genre':
-      return currentData.filter((book) => book.genre.toLowerCase().includes(val.toLowerCase()));
+    case 'bookName': {
+      const bookNameExactMatches = currentData.filter(
+        (book) => book.bookName.toLowerCase() === val.toLowerCase(),
+      );
+      if (bookNameExactMatches.length > 0) {
+        return bookNameExactMatches;
+      }
+      const startsWithMatches = currentData.filter(
+        (book) => book.bookName.toLowerCase().startsWith(val.toLowerCase()),
+      );
+      if (startsWithMatches.length > 0) {
+        return startsWithMatches;
+      }
+      return currentData.filter(
+        (book) => book.bookName.toLowerCase().includes(val.toLowerCase()),
+      );
+    }
+    case 'genre': {
+      const lowerVal = val.toLowerCase();
+      const genreExactMatches = currentData.filter(
+        (book) => book.genre.toLowerCase() === lowerVal,
+      );
+      if (genreExactMatches.length > 0) {
+        return genreExactMatches;
+      }
+      const genreStartsWithMatches = currentData.filter(
+        (book) => book.genre.toLowerCase().startsWith(lowerVal),
+      );
+      if (genreStartsWithMatches.length > 0) {
+        return genreStartsWithMatches;
+      }
+      return currentData.filter(
+        (book) => book.genre.toLowerCase().includes(lowerVal),
+      );
+    }
     case 'priceMin':
       return currentData.filter((book) => book.price >= val);
     case 'priceMax':
       return currentData.filter((book) => book.price <= val);
-    case 'author':
-      return currentData.filter((book) => book.author.toLowerCase().includes(val.toLowerCase()));
+    case 'author': {
+      const lowerVal = val.toLowerCase();
+      const authorExactMatches = currentData.filter(
+        (book) => book.author.toLowerCase() === lowerVal,
+      );
+      if (authorExactMatches.length > 0) {
+        return authorExactMatches;
+      }
+      const authorStartsWithMatches = currentData.filter(
+        (book) => book.author.toLowerCase().startsWith(lowerVal),
+      );
+      if (authorStartsWithMatches.length > 0) {
+        return authorStartsWithMatches;
+      }
+      return currentData.filter(
+        (book) => book.author.toLowerCase().includes(lowerVal),
+      );
+    }
     case 'publicationYear':
       return currentData.filter(
         (book) => book.publicationYear.toString() === val,
@@ -261,9 +308,9 @@ const renderSearchedBookDetails = (filteredData) => {
     similarBookContainer.style.display = 'block';
     let bookToExamine;
     if (!priceMinFilter.value && priceMaxFilter.value) {
-      bookToExamine = filteredData[filteredData.length - 1];
+      [bookToExamine] = filteredData.slice(-1);
     } else {
-      bookToExamine = filteredData[0];
+      [bookToExamine] = filteredData;
     }
     const coverImage = bookToExamine.coverImage
       ? bookToExamine.coverImage
