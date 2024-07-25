@@ -225,27 +225,31 @@ const renderSimilarBooks = (currentBook) => {
       && book.price <= currentBook.price * 1.1,
   );
 
-  // Combine and remove duplicate books using a Map
-  const similarBooks = new Map();
+  similarGenreAndPriceBooks.sort((a, b) => a.price - b.price);
+  similarGenreBooks.sort((a, b) => a.price - b.price);
+  similarPricedBooks.sort((a, b) => a.price - b.price);
+  // Combine and remove duplicate books
+  const combinedBooks = [
+    ...similarGenreAndPriceBooks,
+    ...similarGenreBooks.filter(
+      (book) => !similarGenreAndPriceBooks.some((b) => b.bookId === book.bookId),
+    ),
+    ...similarPricedBooks.filter((book) =>
+      // eslint-disable-next-line implicit-arrow-linebreak
+      !similarGenreAndPriceBooks.some((b) => b.bookId === book.bookId)
+      && !similarGenreBooks.some((b) => b.bookId === book.bookId)),
+  ];
 
-  similarGenreAndPriceBooks.forEach((book) => {
-    similarBooks.set(book.bookId, book);
-  });
-
-  similarGenreBooks.forEach((book) => {
-    if (!similarBooks.has(book.bookId)) {
-      similarBooks.set(book.bookId, book);
-    }
-  });
-
-  similarPricedBooks.forEach((book) => {
-    if (!similarBooks.has(book.bookId)) {
-      similarBooks.set(book.bookId, book);
+  // Remove duplicates while maintaining order
+  const uniqueBooksMap = new Map();
+  combinedBooks.forEach((book) => {
+    if (!uniqueBooksMap.has(book.bookId)) {
+      uniqueBooksMap.set(book.bookId, book);
     }
   });
 
   // Convert Map to array and limit to 10 books for display
-  finalSimilarBookList = Array.from(similarBooks.values());
+  finalSimilarBookList = Array.from(uniqueBooksMap.values()).slice(0, 10);
 
   // Clear previous similar books
   similarTableBody.innerHTML = '';
