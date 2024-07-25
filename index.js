@@ -18,7 +18,7 @@ let isAsc = true;
 let currentPage = 1;
 const rowsPerPage = 10;
 
-const paginateData = (data, page, rowsPerPage) => {
+const paginateData = (page) => {
   const start = (page - 1) * rowsPerPage;
   const end = start + rowsPerPage;
   return data.slice(start, end);
@@ -47,7 +47,7 @@ const renderPagination = (totalPages) => {
 
   paginationElement.appendChild(createPageItem(currentPage - 1, 'Previous'));
 
-  for (let i = 1; i <= totalPages; i++) {
+  for (let i = 1; i <= totalPages; i += 1) {
     paginationElement.appendChild(createPageItem(i, i));
   }
 
@@ -55,13 +55,10 @@ const renderPagination = (totalPages) => {
 };
 
 const renderAllBooks = () => {
-  console.log('Called Render All Books :- ');
   const allBooksTable = document.querySelector('#table-all-books tbody');
   allBooksTable.innerHTML = '';
 
-  const paginatedData = paginateData(data, currentPage, rowsPerPage);
-  console.log('Pagination Data :- ');
-  console.log(paginatedData);
+  const paginatedData = paginateData(currentPage);
   paginatedData.forEach((book) => {
     const coverImage = book.coverImage ? book.coverImage : defaultImage;
     const newRow = document.createElement('tr');
@@ -92,29 +89,31 @@ const filterData = (val, filterType, currentData) => {
     case 'author':
       return currentData.filter((book) => book.author.toLowerCase().includes(val.toLowerCase()));
     case 'publicationYear':
-      return currentData.filter((book) => book.publicationYear.toString() === val);
+      return currentData.filter(
+        (book) => book.publicationYear.toString() === val,
+      );
     default:
       return currentData;
   }
 };
 
 const renderSimilarBooks = (currentBook) => {
-  const similarGenreAndPriceBooks = data.filter((book) => (
-    book.bookId !== currentBook.bookId
+  const similarGenreAndPriceBooks = data.filter(
+    (book) => book.bookId !== currentBook.bookId
       && book.price >= currentBook.price * 0.9
       && book.price <= currentBook.price * 1.1
-      && book.genre.toLowerCase() === currentBook.genre.toLowerCase()
-  ));
+      && book.genre.toLowerCase() === currentBook.genre.toLowerCase(),
+  );
 
-  const similarGenreBooks = data.filter((book) => (
-    book.bookId !== currentBook.bookId
-      && book.genre.toLowerCase() === currentBook.genre.toLowerCase()
-  ));
-  const similarPricedBooks = data.filter((book) => (
-    book.bookId !== currentBook.bookId
+  const similarGenreBooks = data.filter(
+    (book) => book.bookId !== currentBook.bookId
+      && book.genre.toLowerCase() === currentBook.genre.toLowerCase(),
+  );
+  const similarPricedBooks = data.filter(
+    (book) => book.bookId !== currentBook.bookId
       && book.price >= currentBook.price * 0.9
-      && book.price <= currentBook.price * 1.1
-  ));
+      && book.price <= currentBook.price * 1.1,
+  );
 
   // Remove Duplicates
   const similarBooks = new Map();
@@ -136,8 +135,6 @@ const renderSimilarBooks = (currentBook) => {
   });
 
   finalSimilarBookList = Array.from(similarBooks.values());
-  console.log('All Similar Books :- ');
-  console.log(finalSimilarBookList);
   similarTableBody.innerHTML = ''; // Clear old rows to avoid duplicates
   finalSimilarBookList.slice(0, 10).forEach((book) => {
     const coverImage = book.coverImage || defaultImage;
@@ -151,10 +148,12 @@ const renderSimilarBooks = (currentBook) => {
       <td>${book.publicationYear}</td>`;
     similarTableBody.appendChild(rowEntry);
   });
-  similarBookCount.innerHTML = `Showing <b>${Math.min(10, finalSimilarBookList.length)}</b> of <b>${finalSimilarBookList.length}</b> Similar Book(s)`;
+  similarBookCount.innerHTML = `Showing <b>${Math.min(
+    10,
+    finalSimilarBookList.length,
+  )}</b> of <b>${finalSimilarBookList.length}</b> Similar Book(s)`;
   renderAllBooks();
 };
-
 
 const renderSearchedBookDetails = (filteredData) => {
   const examinedBookName = document.querySelector('#book-name');
@@ -183,7 +182,7 @@ const renderSearchedBookDetails = (filteredData) => {
     const coverImage = bookToExamine.coverImage
       ? bookToExamine.coverImage
       : defaultImage;
-    examinedBookName.innerHTML = `<b>${bookToExamine.bookName}</b>`;;
+    examinedBookName.innerHTML = `<b>${bookToExamine.bookName}</b>`;
     examinedPrice.innerHTML = `<b>$ ${bookToExamine.price}</b>`;
     examinedGenre.innerHTML = `<b>${bookToExamine.genre}</b>`;
     examinedAuthor.innerHTML = `<b>${bookToExamine.author}</b>`;
@@ -198,41 +197,37 @@ const renderSearchedBookDetails = (filteredData) => {
 
 // API CALL THROUGH PROMISES
 function getBooksDataPromises() {
-  console.log('In Get Books Data Promises');
   const localData = localStorage.getItem('bookData');
   if (localData) {
-    return Promise.resolve(JSON.parse(localData));
-  } else {
-    console.log('Fetching Data from API');
-    return fetch(url)
-      .then((res) => res.json())
-      .then((allBookData) => {
-        localStorage.setItem('bookData', JSON.stringify(allBookData));
-        return allBookData;
-      })
-      .catch((err) => {
-        console.error('Error in Fetching Book Data', err);
-        return [];
-      });
+    data = JSON.parse(localData);
+    return Promise.resolve(data);
   }
+  return fetch(url)
+    .then((res) => res.json())
+    .then((allBookData) => {
+      localStorage.setItem('bookData', JSON.stringify(allBookData));
+      data = allBookData;
+      return allBookData;
+    })
+    .catch((err) => {
+      console.error('Error in Fetching Book Data', err);
+      data = [];
+      return data;
+    });
 }
 
 // API CALL THROUGH ASYNC AWAIT
+// eslint-disable-next-line no-unused-vars
 async function getBooksData() {
-  console.log('In Get Book Data');
   const localData = localStorage.getItem('bookData');
   try {
     if (localData) {
-      console.log('Data fetched from local storage:');
       data = JSON.parse(localData);
     } else {
-      console.log('Fetching data from API...');
       const rawData = await fetch(url);
       const allBookData = await rawData.json();
       data = allBookData;
       localStorage.setItem('bookData', JSON.stringify(allBookData));
-      console.log('Data fetched and stored in local storage:');
-      console.log(allBookData);
     }
   } catch (err) {
     console.error('Error in Fetching Book Data');
@@ -254,7 +249,6 @@ const savePageState = () => {
 };
 
 const loadPageState = () => {
-  console.log('In loadPageState');
   const filterState = JSON.parse(localStorage.getItem('filterState'));
   if (filterState) {
     bookNameFilter.value = filterState.bookName;
@@ -266,21 +260,19 @@ const loadPageState = () => {
   }
 };
 
+// eslint-disable-next-line no-unused-vars
 const handleSort = (valType, tableType) => {
-  console.log(valType);
-  console.log(tableType);
   if (tableType === 'similar-books-table') {
-    console.log('In If of Similar  Books');
-    console.log(finalSimilarBookList);
     similarTableBody.innerHTML = '';
     if (valType === 'price') {
       finalSimilarBookList.sort((a, b) => (isAsc ? a.price - b.price : b.price - a.price));
     } else if (valType === 'year') {
-      finalSimilarBookList.sort((a, b) => (
-        isAsc ? a.publicationYear - b.publicationYear : b.publicationYear - a.publicationYear
-      ));
+      finalSimilarBookList.sort((a, b) => (isAsc
+        ? a.publicationYear - b.publicationYear
+        : b.publicationYear - a.publicationYear));
     }
     isAsc = !isAsc;
+    // eslint-disable-next-line no-plusplus
     for (let i = 0; i < finalSimilarBookList.length && i < 10; i++) {
       const coverImage = finalSimilarBookList[i].coverImage || defaultImage;
       const rowEntry = document.createElement('tr');
@@ -298,13 +290,16 @@ const handleSort = (valType, tableType) => {
     if (valType === 'price') {
       data.sort((a, b) => (isAsc ? a.price - b.price : b.price - a.price));
     } else if (valType === 'year') {
-      data.sort((a, b) => (isAsc ? a.publicationYear - b.publicationYear : b.publicationYear - a.publicationYear));
+      data.sort((a, b) => (isAsc
+        ? a.publicationYear - b.publicationYear
+        : b.publicationYear - a.publicationYear));
     }
     isAsc = !isAsc;
     renderAllBooks();
   }
 };
 
+// eslint-disable-next-line no-unused-vars
 const handleSearch = () => {
   let filteredData = data;
   const filters = [
@@ -313,16 +308,16 @@ const handleSearch = () => {
     { value: priceMinFilter.value, type: 'priceMin' },
     { value: priceMaxFilter.value, type: 'priceMax' },
     { value: bookAuthorFilter.value, type: 'author' },
-    { value: yearFilter.value, type: 'publicationYear' }
+    { value: yearFilter.value, type: 'publicationYear' },
   ];
 
-  filters.forEach(filter => {
+  filters.forEach((filter) => {
     if (filter.value) {
       filteredData = filterData(filter.value, filter.type, filteredData);
     }
   });
 
-  if (filters.some(filter => filter.value)) {
+  if (filters.some((filter) => filter.value)) {
     filteredData.sort((a, b) => a.price - b.price);
     similarBookContainer.style.display = 'block';
     renderSearchedBookDetails(filteredData);
@@ -333,21 +328,18 @@ const handleSearch = () => {
   savePageState();
 };
 
+const handleExaminedBookANdRender = () => {
+  const examinedBook = JSON.parse(localStorage.getItem('examinedBook'));
+  if (examinedBook) {
+    renderSearchedBookDetails([examinedBook]);
+  }
+  renderAllBooks();
+};
+
 const initialize = async () => {
   loadPageState();
   // await getBooksData();
-  getBooksDataPromises().then(fetchedData => {
-    data = fetchedData;
-    const examinedBook = JSON.parse(localStorage.getItem('examinedBook'));
-    if (examinedBook) {
-      renderSearchedBookDetails([examinedBook]);
-    }
-    renderAllBooks();
-  });
-  // const examinedBook = JSON.parse(localStorage.getItem('examinedBook'));
-  // if (examinedBook) {
-  //   renderSearchedBookDetails([examinedBook]);
-  // }
-  // renderAllBooks();
+  // handleExaminedBookANdRender();
+  getBooksDataPromises().then(handleExaminedBookANdRender);
 };
 initialize();
