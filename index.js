@@ -249,7 +249,9 @@ const renderSimilarBooks = (currentBook) => {
   });
 
   // Convert Map to array and limit to 10 books for display
-  finalSimilarBookList = Array.from(uniqueBooksMap.values()).slice(0, 10);
+  finalSimilarBookList = Array.from(uniqueBooksMap.values());
+  console.log('FInal Similar Book List:');
+  console.log(finalSimilarBookList);
 
   // Clear previous similar books
   similarTableBody.innerHTML = '';
@@ -364,8 +366,8 @@ function getBooksDataPromises() {
     })
     .catch((err) => {
       console.error('Error in Fetching Book Data', err);
-      data = [];
-      return data;
+      // data = [];
+      // return data;
     });
 }
 
