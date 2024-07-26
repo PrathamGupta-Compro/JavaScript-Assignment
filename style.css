@@ -1,12 +1,19 @@
+.similar-book-container{
+    display: none;
+}
+
 .table-sortable thead th{
     cursor: pointer;
 }
-.table-sortable .th-sort-asc::after{
+/* .table-sortable .th-sort-asc::after{
     content:'\25b4';
 }
 .table-sortable .th-sort-desc::after{
     content:'\25be';
-}
+} */
+ .fa-arrow-down-short-wide{
+    display: none;
+ }
 #book-image {
     width: 300px;
     height: 300px;
@@ -23,6 +30,7 @@
 #list-examined-book{
     flex: 1;
     display: flex;
+    height: 300px;
 }
 #list-examined-book li{
     flex: 1;
@@ -33,4 +41,7 @@
         justify-content: center;
         align-items: center;
     }
+}
+.fa-sort{
+    margin-left: 0.5rem;
 }
